@@ -31,7 +31,6 @@ script:
   - export OC_USER=`oc whoami` OC_PASS=`oc whoami -t`
   - oc login -u system:admin
   - oc rollout status -w dc/docker-registry -n default || oc rollout retry dc/docker-registry -n default && oc rollout status -w dc/docker-registry -n default
-  - docker ps
   - REGISTRY=`oc get svc/docker-registry -n default --template '{{.spec.clusterIP}}:{{index .spec.ports 0 "port"}}'`
-  - make openshift-test REGISTRY=${REGISTRY} OC_USER=${OC_USER} OC_PASS=${OC_PASS}
+  - make openshift-test TARGET=centos7 REGISTRY=${REGISTRY} OC_USER=${OC_USER} OC_PASS=${OC_PASS}
   - oc version
