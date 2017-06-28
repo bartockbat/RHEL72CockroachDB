@@ -45,6 +45,7 @@ openshift-test:
 	docker push ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
 	oc run ${IMAGE_NAME} --image=${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME} -- start --insecure
 	oc rollout status -w dc/${IMAGE_NAME}
+	oc expose dc/${IMAGE_NAME} --port=8080
 	oc status
 	sleep 5
 	oc describe pod `oc get pod --template '{{(index .items 0).metadata.name }}'`
