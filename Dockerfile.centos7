@@ -10,7 +10,7 @@ LABEL name="cockroachdb/cockroach" \
       description="CockroachDB will ....."
 
 #Copy files to container
-COPY /cockroach /cockroach 
+COPY cockroach /cockroach 
 
 #Set perms to support non-root & arbitrary uid runtime in OpenShift
 RUN chown -R 99:0 /cockroach && \

@@ -32,7 +32,6 @@ test:
 	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} start --insecure))
 	@sleep 3
 	@docker exec ${CONTAINERID} curl localhost:8080
-	@docker exec ${CONTAINERID} ps aux
 	@docker logs ${CONTAINERID}
 	@docker rm -f ${CONTAINERID}
 
@@ -50,7 +49,7 @@ openshift-test:
 	sleep 5
 	oc describe pod `oc get pod --template '{{(index .items 0).metadata.name }}'`
 	curl `oc get svc/${IMAGE_NAME} --template '{{.spec.clusterIP}}:{{index .spec.ports 0 "port"}}'`
-	oc exec `oc get pod --template '{{(index .items 0).metadata.name }}'` ps aux
+	oc logs dc/${IMAGE_NAME}
 
 run:
 	docker run -tdi -u $(shell shuf -i 1000010000-1000020000 -n 1) \
