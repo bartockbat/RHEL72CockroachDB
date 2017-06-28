@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/rhel7
+FROM centos:7
 
 MAINTAINER Tobias Schottdorf <tobias.schottdorf@gmail.com>  
 
@@ -8,9 +8,6 @@ LABEL name="cockroachdb/cockroach" \
       release="1" \
       summary="CockroachDB is ..." \
       description="CockroachDB will ....."
-
-#Atomic Help File
-COPY help.1 /help.1
 
 #Copy files to container
 COPY /cockroach /cockroach 
