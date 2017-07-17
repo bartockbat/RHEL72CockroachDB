@@ -29,7 +29,7 @@ test:
 	--cap-drop=SYS_CHROOT \
 	--cap-drop=SETUID \
 	--cap-drop=SETGID \
-	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} start --insecure))
+	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
 	@sleep 3
 	@docker exec ${CONTAINERID} curl localhost:8080
 	@docker logs ${CONTAINERID}
@@ -42,17 +42,16 @@ openshift-test:
 	docker login -u ${OC_USER} -p ${OC_PASS} ${REGISTRY}
 	docker tag ${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
 	docker push ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
-	oc run ${IMAGE_NAME} --image=${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME} -- start --insecure
+	oc new-app -i ${IMAGE_NAME}
 	oc rollout status -w dc/${IMAGE_NAME}
-	oc expose dc/${IMAGE_NAME} --port=8080
 	oc status
 	sleep 5
 	oc describe pod `oc get pod --template '{{(index .items 0).metadata.name }}'`
-	curl `oc get svc/${IMAGE_NAME} --template '{{.spec.clusterIP}}:{{index .spec.ports 0 "port"}}'`
+	curl `oc get svc/${IMAGE_NAME} --template '{{.spec.clusterIP}}'`:8080
 	oc logs dc/${IMAGE_NAME}
 
 run:
-	docker run -tdi -u $(shell shuf -i 1000010000-1000020000 -n 1) \
+	$(eval CONTAINERID=$(shell docker run -tdi -u $(shell shuf -i 1000010000-1000020000 -n 1) \
 	--hostname="localhost.localdomain" \
 	-p 26257:26257 \
 	-p 8080:8080 \
@@ -61,7 +60,9 @@ run:
 	--cap-drop=SYS_CHROOT \
 	--cap-drop=SETUID \
 	--cap-drop=SETGID \
-	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} start --insecure
+	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
+	@sleep 3
+	@docker logs ${CONTAINERID}
 
 clean:
 	rm -f build
