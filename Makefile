@@ -32,7 +32,6 @@ test:
 	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
 	@sleep 3
 	@docker exec ${CONTAINERID} curl localhost:8080
-	@docker exec ${CONTAINERID} ps aux
 	@docker logs ${CONTAINERID}
 	@docker rm -f ${CONTAINERID}
 
