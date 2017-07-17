@@ -29,9 +29,10 @@ test:
 	--cap-drop=SYS_CHROOT \
 	--cap-drop=SETUID \
 	--cap-drop=SETGID \
-	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} start --insecure))
+	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
 	@sleep 3
 	@docker exec ${CONTAINERID} curl localhost:8080
+	@docker exec ${CONTAINERID} ps aux
 	@docker logs ${CONTAINERID}
 	@docker rm -f ${CONTAINERID}
 
@@ -42,7 +43,7 @@ openshift-test:
 	docker login -u ${OC_USER} -p ${OC_PASS} ${REGISTRY}
 	docker tag ${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
 	docker push ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
-	oc run ${IMAGE_NAME} --image=${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME} -- start --insecure
+	oc run ${IMAGE_NAME} --image=${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
 	oc rollout status -w dc/${IMAGE_NAME}
 	oc expose dc/${IMAGE_NAME} --port=8080
 	oc status
@@ -52,7 +53,7 @@ openshift-test:
 	oc logs dc/${IMAGE_NAME}
 
 run:
-	docker run -tdi -u $(shell shuf -i 1000010000-1000020000 -n 1) \
+	$(eval CONTAINERID=$(shell docker run -tdi -u $(shell shuf -i 1000010000-1000020000 -n 1) \
 	--hostname="localhost.localdomain" \
 	-p 26257:26257 \
 	-p 8080:8080 \
@@ -61,7 +62,9 @@ run:
 	--cap-drop=SYS_CHROOT \
 	--cap-drop=SETUID \
 	--cap-drop=SETGID \
-	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} start --insecure
+	${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
+	@sleep 3
+	@docker logs ${CONTAINERID}
 
 clean:
 	rm -f build

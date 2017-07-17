@@ -33,4 +33,4 @@ USER 99
 
 #Run the script to start up the DB
 ENTRYPOINT ["/cockroach/cockroach.sh"]     
-
+CMD ["start","--insecure"]
