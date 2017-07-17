@@ -42,9 +42,8 @@ openshift-test:
 	docker login -u ${OC_USER} -p ${OC_PASS} ${REGISTRY}
 	docker tag ${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION} ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
 	docker push ${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
-	oc run ${IMAGE_NAME} --image=${REGISTRY}/${PROJ_RANDOM}/${IMAGE_NAME}
+	oc new-app -i ${IMAGE_NAME}
 	oc rollout status -w dc/${IMAGE_NAME}
-	oc expose dc/${IMAGE_NAME} --port=8080
 	oc status
 	sleep 5
 	oc describe pod `oc get pod --template '{{(index .items 0).metadata.name }}'`
